@@ -39,6 +39,9 @@ const getAddressById = async (req, res) => {
 // @access  Private
 const addAddress = async (req, res) => {
     try {
+        console.log('Adding address for user:', req.user._id);
+        console.log('Request body:', req.body);
+
         const {
             name,
             phone,
@@ -51,6 +54,29 @@ const addAddress = async (req, res) => {
             addressType,
             isDefault
         } = req.body;
+
+        // Validate required fields
+        if (!name || !phone || !addressLine1 || !city || !state || !pincode) {
+            return res.status(400).json({ message: 'Please fill all required fields' });
+        }
+
+        // Validate phone number format
+        if (!/^[0-9]{10}$/.test(phone)) {
+            return res.status(400).json({ message: 'Phone number must be 10 digits' });
+        }
+
+        // Validate pincode format
+        if (!/^[0-9]{6}$/.test(pincode)) {
+            return res.status(400).json({ message: 'Pincode must be 6 digits' });
+        }
+
+        // If setting as default, unset default for other addresses
+        if (isDefault) {
+            await Address.updateMany(
+                { user: req.user._id },
+                { isDefault: false }
+            );
+        }
 
         const address = new Address({
             user: req.user._id,
@@ -67,8 +93,10 @@ const addAddress = async (req, res) => {
         });
 
         const createdAddress = await address.save();
+        console.log('Address created:', createdAddress);
         res.status(201).json(createdAddress);
     } catch (error) {
+        console.error('Error adding address:', error);
         res.status(400).json({ message: error.message });
     }
 };
@@ -87,6 +115,14 @@ const updateAddress = async (req, res) => {
         // Check if user owns this address
         if (address.user.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Not authorized' });
+        }
+
+        // If setting as default, unset default for other addresses
+        if (req.body.isDefault && !address.isDefault) {
+            await Address.updateMany(
+                { user: req.user._id, _id: { $ne: address._id } },
+                { isDefault: false }
+            );
         }
 
         Object.keys(req.body).forEach(key => {

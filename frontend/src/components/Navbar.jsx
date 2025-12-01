@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import AuthContext from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import { FaShoppingCart, FaUser, FaSearch } from 'react-icons/fa';
@@ -7,6 +7,7 @@ import { FaShoppingCart, FaUser, FaSearch } from 'react-icons/fa';
 const Navbar = () => {
     const { user, logout } = useContext(AuthContext);
     const { cart } = useContext(CartContext);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     return (
         <nav className="bg-white shadow-md sticky top-0 z-50">
@@ -35,15 +36,24 @@ const Navbar = () => {
 
                     <div className="flex items-center space-x-4 text-xl">
                         {user ? (
-                            <div className="relative group">
-                                <button className="flex items-center space-x-1 hover:text-primary">
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                    className="flex items-center space-x-1 hover:text-primary"
+                                >
                                     <FaUser />
                                 </button>
-                                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 hidden group-hover:block border border-gray-100">
-                                    <div className="px-4 py-2 border-b text-sm text-gray-600">Hello, {user.name}</div>
-                                    <Link to="/orders" className="block px-4 py-2 hover:bg-gray-50 text-sm">My Orders</Link>
-                                    <button onClick={logout} className="block w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-red-500">Logout</button>
-                                </div>
+                                {isProfileOpen && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 border border-gray-100 z-10">
+                                        <div className="px-4 py-2 border-b text-sm text-gray-600">Hello, {user.name}</div>
+                                        {user.role === 'admin' && (
+                                            <Link to="/admin/dashboard" onClick={() => setIsProfileOpen(false)} className="block px-4 py-2 hover:bg-gray-50 text-sm font-semibold text-primary">Admin Dashboard</Link>
+                                        )}
+                                        <Link to="/profile" onClick={() => setIsProfileOpen(false)} className="block px-4 py-2 hover:bg-gray-50 text-sm">My Profile</Link>
+                                        <Link to="/orders" onClick={() => setIsProfileOpen(false)} className="block px-4 py-2 hover:bg-gray-50 text-sm">My Orders</Link>
+                                        <button onClick={() => { logout(); setIsProfileOpen(false); }} className="block w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-red-500">Logout</button>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <Link to="/login" className="text-sm font-semibold hover:text-primary">Login</Link>

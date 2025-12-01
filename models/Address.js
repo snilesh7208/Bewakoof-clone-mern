@@ -57,15 +57,4 @@ const addressSchema = mongoose.Schema({
     }
 }, { timestamps: true });
 
-// Ensure only one default address per user
-addressSchema.pre('save', async function (next) {
-    if (this.isDefault) {
-        await this.constructor.updateMany(
-            { user: this.user, _id: { $ne: this._id } },
-            { isDefault: false }
-        );
-    }
-    next();
-});
-
 module.exports = mongoose.model('Address', addressSchema);

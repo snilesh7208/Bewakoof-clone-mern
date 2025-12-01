@@ -19,6 +19,11 @@ app.use(cors());
 // Static folder for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Wrapper for async middleware
+const asyncMiddleware = (fn) => (req, res, next) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+};
+
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
@@ -29,12 +34,17 @@ app.use('/api/coupons', require('./routes/couponRoutes'));
 app.use('/api/addresses', require('./routes/addressRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 
-// Error Handler Middleware
+// 404 Handler
+app.use((req, res) => {
+    res.status(404).json({ message: 'Route not found' });
+});
+
+// Error Handler Middleware (must be last)
 app.use((err, req, res, next) => {
-    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-    res.status(statusCode);
-    res.json({
-        message: err.message,
+    console.error('Global error handler:', err);
+    const statusCode = err.status || err.statusCode || 500;
+    res.status(statusCode).json({
+        message: err.message || 'Internal Server Error',
         stack: process.env.NODE_ENV === 'production' ? null : err.stack,
     });
 });

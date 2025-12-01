@@ -13,7 +13,7 @@ const DELIVERY_CHARGES = 99;
 // @desc    Create new order (Checkout)
 // @route   POST /api/orders/checkout
 // @access  Private
-const checkout = async (req, res) => {
+const checkout = async (req, res, next) => {
     const { items, address, paymentMethodId, paymentMethod, couponCode } = req.body;
 
     try {
@@ -24,7 +24,7 @@ const checkout = async (req, res) => {
             if (!product) {
                 return res.status(404).json({ message: `Product not found: ${item.product}` });
             }
-            subtotal += product.price * item.quantity;
+            subtotal += item.price * item.quantity;
         }
 
         // Apply coupon if provided
@@ -124,32 +124,36 @@ const checkout = async (req, res) => {
             await product.save();
         }
 
+        // Clear user's cart
+        const Cart = require('../models/Cart');
+        await Cart.findOneAndDelete({ user: req.user._id });
+
         res.status(201).json(createdOrder);
 
     } catch (error) {
         console.error('Checkout error:', error);
-        res.status(400).json({ message: error.message });
+        next(error);
     }
 };
 
 // @desc    Get logged in user orders
 // @route   GET /api/orders/user
 // @access  Private
-const getUserOrders = async (req, res) => {
+const getUserOrders = async (req, res, next) => {
     try {
         const orders = await Order.find({ user: req.user._id })
             .populate('items.product', 'name images price')
             .sort({ createdAt: -1 });
         res.json(orders);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 };
 
 // @desc    Get order by ID
 // @route   GET /api/orders/:id
 // @access  Private
-const getOrderById = async (req, res) => {
+const getOrderById = async (req, res, next) => {
     try {
         const order = await Order.findById(req.params.id)
             .populate('items.product', 'name images price')
@@ -166,14 +170,14 @@ const getOrderById = async (req, res) => {
 
         res.json(order);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 };
 
 // @desc    Cancel order
 // @route   PUT /api/orders/:id/cancel
 // @access  Private
-const cancelOrder = async (req, res) => {
+const cancelOrder = async (req, res, next) => {
     try {
         const order = await Order.findById(req.params.id);
 
@@ -235,14 +239,14 @@ const cancelOrder = async (req, res) => {
         await order.save();
         res.json({ message: 'Order cancelled successfully', order });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 };
 
 // @desc    Request return
 // @route   PUT /api/orders/:id/return
 // @access  Private
-const requestReturn = async (req, res) => {
+const requestReturn = async (req, res, next) => {
     try {
         const order = await Order.findById(req.params.id);
 
@@ -278,14 +282,14 @@ const requestReturn = async (req, res) => {
         await order.save();
         res.json({ message: 'Return request submitted successfully', order });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 };
 
 // @desc    Get all orders (Admin)
 // @route   GET /api/orders/admin
 // @access  Private/Admin
-const getAdminOrders = async (req, res) => {
+const getAdminOrders = async (req, res, next) => {
     try {
         const orders = await Order.find({})
             .populate('user', 'name email mobile')
@@ -293,14 +297,14 @@ const getAdminOrders = async (req, res) => {
             .sort({ createdAt: -1 });
         res.json(orders);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 };
 
 // @desc    Update order status (Admin)
 // @route   PUT /api/orders/:id/status
 // @access  Private/Admin
-const updateOrderStatus = async (req, res) => {
+const updateOrderStatus = async (req, res, next) => {
     try {
         const order = await Order.findById(req.params.id);
 
@@ -321,14 +325,14 @@ const updateOrderStatus = async (req, res) => {
         await order.save();
         res.json({ message: 'Order status updated', order });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 };
 
 // @desc    Apply coupon
 // @route   POST /api/orders/apply-coupon
 // @access  Private
-const applyCoupon = async (req, res) => {
+const applyCoupon = async (req, res, next) => {
     try {
         const { code, orderAmount } = req.body;
 
@@ -351,7 +355,7 @@ const applyCoupon = async (req, res) => {
             description: coupon.description
         });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        next(error);
     }
 };
 

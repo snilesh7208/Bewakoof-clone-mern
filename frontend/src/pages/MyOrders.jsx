@@ -27,7 +27,12 @@ const MyOrders = () => {
             }
 
             const data = await response.json();
-            setOrders(data);
+            if (Array.isArray(data)) {
+                setOrders(data);
+            } else {
+                setOrders([]);
+                console.error('Orders data is not an array:', data);
+            }
         } catch (error) {
             toast.error(error.message);
         } finally {
@@ -143,11 +148,17 @@ const MyOrders = () => {
                             <div className="px-6 py-4">
                                 {order.items.map((item, index) => (
                                     <div key={index} className="flex items-center space-x-4 py-3 border-b last:border-b-0">
-                                        <div className="w-20 h-20 bg-gray-200 rounded-md flex items-center justify-center">
-                                            <FaBox className="text-gray-400 text-2xl" />
+                                        <div className="w-20 h-20 bg-gray-200 rounded-md flex items-center justify-center overflow-hidden">
+                                            {item.product && item.product.images && item.product.images.length > 0 ? (
+                                                <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <FaBox className="text-gray-400 text-2xl" />
+                                            )}
                                         </div>
                                         <div className="flex-grow">
-                                            <h3 className="font-semibold text-gray-800">Product #{item.product}</h3>
+                                            <h3 className="font-semibold text-gray-800">
+                                                {item.product ? item.product.name : 'Product Unavailable'}
+                                            </h3>
                                             <p className="text-sm text-gray-600">Size: {item.size} | Qty: {item.quantity}</p>
                                             <p className="text-sm font-semibold text-gray-800">₹{item.price}</p>
                                         </div>

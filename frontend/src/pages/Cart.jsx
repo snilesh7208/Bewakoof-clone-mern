@@ -1,10 +1,16 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { CartContext } from '../context/CartContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
 
 const Cart = () => {
-    const { cart, removeFromCart } = useContext(CartContext);
+    const { cart, removeFromCart, fetchCart } = useContext(CartContext);
+    const navigate = useNavigate();
+
+    // Refetch cart when component mounts to ensure latest data
+    useEffect(() => {
+        fetchCart();
+    }, [fetchCart]);
 
     const validItems = cart.items?.filter(item => item.product) || [];
 
@@ -77,7 +83,7 @@ const Cart = () => {
                     <div className="mt-6">
                         <button
                             className="w-full rounded-md border border-transparent bg-primary px-4 py-3 text-base font-medium text-black shadow-sm hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50"
-                            onClick={() => alert('Checkout functionality to be implemented with Stripe')}
+                            onClick={() => navigate('/checkout')}
                         >
                             Checkout
                         </button>

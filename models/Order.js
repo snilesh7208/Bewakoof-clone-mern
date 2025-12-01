@@ -130,7 +130,7 @@ const orderSchema = mongoose.Schema({
 }, { timestamps: true });
 
 // Add timeline entry when status changes
-orderSchema.pre('save', function (next) {
+orderSchema.pre('save', async function () {
     if (this.isModified('status')) {
         this.timeline.push({
             status: this.status,
@@ -138,7 +138,6 @@ orderSchema.pre('save', function (next) {
             message: `Order ${this.status}`
         });
     }
-    next();
 });
 
 module.exports = mongoose.model('Order', orderSchema);
