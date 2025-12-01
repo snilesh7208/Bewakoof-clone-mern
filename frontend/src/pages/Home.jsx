@@ -18,12 +18,12 @@ const Home = () => {
                                 </p>
                                 <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                                     <div className="rounded-md shadow">
-                                        <Link to="/products" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-black bg-primary hover:bg-yellow-400 md:py-4 md:text-lg md:px-10">
+                                        <Link to="/products?category=Men" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-black bg-primary hover:bg-yellow-400 md:py-4 md:text-lg md:px-10">
                                             Shop Men
                                         </Link>
                                     </div>
                                     <div className="mt-3 sm:mt-0 sm:ml-3">
-                                        <Link to="/products" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-gray-800 hover:bg-gray-900 md:py-4 md:text-lg md:px-10">
+                                        <Link to="/products?category=Women" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-gray-800 hover:bg-gray-900 md:py-4 md:text-lg md:px-10">
                                             Shop Women
                                         </Link>
                                     </div>
@@ -45,14 +45,14 @@ const Home = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Shop by Category</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {['T-Shirts', 'Joggers', 'Accessories'].map((category) => (
+                    {['Men', 'Women', 'Mobile Covers'].map((category) => (
                         <Link key={category} to={`/products?category=${category}`} className="relative rounded-lg overflow-hidden group shadow-lg h-64">
                             <div className="absolute inset-0 bg-gray-900 opacity-40 group-hover:opacity-30 transition"></div>
                             <div className="absolute inset-0 flex items-center justify-center">
                                 <h3 className="text-3xl font-bold text-white tracking-wider">{category}</h3>
                             </div>
                             <img
-                                src={`https://source.unsplash.com/800x600/?${category.toLowerCase()},fashion`}
+                                src={`https://source.unsplash.com/800x600/?${category.toLowerCase().replace(' ', '')},fashion`}
                                 alt={category}
                                 className="w-full h-full object-cover transform group-hover:scale-110 transition duration-500"
                             />

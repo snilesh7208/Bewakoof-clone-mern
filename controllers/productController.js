@@ -105,4 +105,98 @@ const deleteProduct = async (req, res) => {
     }
 };
 
-module.exports = { createProduct, getProducts, getProductById, updateProduct, deleteProduct };
+// @desc    Add product review
+// @route   POST /api/products/:id/reviews
+// @access  Private
+const addProductReview = async (req, res) => {
+    try {
+        const { rating, comment, images } = req.body;
+
+        const product = await Product.findById(req.params.id);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Check if user already reviewed
+        const alreadyReviewed = product.reviews.find(
+            r => r.user.toString() === req.user._id.toString()
+        );
+
+        if (alreadyReviewed) {
+            return res.status(400).json({ message: 'Product already reviewed' });
+        }
+
+        const review = {
+            user: req.user._id,
+            name: req.user.name,
+            rating: Number(rating),
+            comment,
+            images: images || []
+        };
+
+        product.reviews.push(review);
+        product.calculateRating();
+
+        await product.save();
+        res.status(201).json({ message: 'Review added successfully' });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// @desc    Get product reviews
+// @route   GET /api/products/:id/reviews
+// @access  Public
+const getProductReviews = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id).select('reviews rating numReviews');
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.json({
+            reviews: product.reviews,
+            rating: product.rating,
+            numReviews: product.numReviews
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get similar products
+// @route   GET /api/products/:id/similar
+// @access  Public
+const getSimilarProducts = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Find products in same category, excluding current product
+        const similarProducts = await Product.find({
+            category: product.category,
+            _id: { $ne: product._id },
+            isActive: true
+        }).limit(8);
+
+        res.json(similarProducts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = {
+    createProduct,
+    getProducts,
+    getProductById,
+    updateProduct,
+    deleteProduct,
+    addProductReview,
+    getProductReviews,
+    getSimilarProducts
+};

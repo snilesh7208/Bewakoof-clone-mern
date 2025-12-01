@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useContext } from 'react';
 import AuthContext from '../context/AuthContext';
-import CartContext from '../context/CartContext';
+import { CartContext } from '../context/CartContext';
 import { FaShoppingCart, FaUser, FaSearch } from 'react-icons/fa';
 
 const Navbar = () => {
@@ -19,6 +19,8 @@ const Navbar = () => {
                     <Link to="/products?category=Men" className="hover:text-primary transition">Men</Link>
                     <Link to="/products?category=Women" className="hover:text-primary transition">Women</Link>
                     <Link to="/products?category=Mobile Covers" className="hover:text-primary transition">Mobile Covers</Link>
+                    <Link to="/about" className="hover:text-primary transition">About Us</Link>
+                    <Link to="/contact" className="hover:text-primary transition">Contact Us</Link>
                 </div>
 
                 <div className="flex items-center space-x-6">

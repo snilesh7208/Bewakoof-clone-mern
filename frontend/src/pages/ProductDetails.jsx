@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import API from '../api/axios';
-import CartContext from '../context/CartContext';
+import { CartContext } from '../context/CartContext';
 import { FaStar, FaShoppingCart } from 'react-icons/fa';
 
 const ProductDetails = () => {

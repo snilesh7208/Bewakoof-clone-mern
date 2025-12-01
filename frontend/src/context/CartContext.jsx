@@ -20,7 +20,7 @@ export const CartProvider = ({ children }) => {
     const fetchCart = async () => {
         try {
             const { data } = await API.get('/cart');
-            setCart(data);
+            setCart(data || { items: [] });
         } catch (error) {
             console.error('Error fetching cart:', error);
         }
@@ -57,4 +57,4 @@ export const CartProvider = ({ children }) => {
     );
 };
 
-export default CartContext;
+export { CartContext };

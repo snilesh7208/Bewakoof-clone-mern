@@ -1,17 +1,19 @@
 import { useContext } from 'react';
-import CartContext from '../context/CartContext';
+import { CartContext } from '../context/CartContext';
 import { Link } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
 
 const Cart = () => {
     const { cart, removeFromCart } = useContext(CartContext);
 
-    const totalAmount = cart.items.reduce((acc, item) => {
+    const validItems = cart.items?.filter(item => item.product) || [];
+
+    const totalAmount = validItems.reduce((acc, item) => {
         const price = item.product.discountPrice || item.product.price;
         return acc + price * item.quantity;
     }, 0);
 
-    if (!cart.items.length) {
+    if (!validItems.length) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Your Cart is Empty</h2>
@@ -25,7 +27,7 @@ const Cart = () => {
             <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
             <div className="lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start">
                 <div className="lg:col-span-7">
-                    {cart.items.map((item) => (
+                    {validItems.map((item) => (
                         <div key={item._id} className="flex py-6 border-b border-gray-200">
                             <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                 <img

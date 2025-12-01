@@ -8,6 +8,9 @@ import Register from './pages/Register';
 import Products from './pages/Products';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
+import Contact from './pages/Contact';
+import About from './pages/About';
+import MyOrders from './pages/MyOrders';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -26,6 +29,9 @@ function App() {
                 <Route path="/products" element={<Products />} />
                 <Route path="/product/:id" element={<ProductDetails />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/orders" element={<MyOrders />} />
               </Routes>
             </main>
             <footer className="bg-gray-800 text-white py-8">
