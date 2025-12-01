@@ -34,9 +34,13 @@ app.use('/api/coupons', require('./routes/couponRoutes'));
 app.use('/api/addresses', require('./routes/addressRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 
-// 404 Handler
-app.use((req, res) => {
-    res.status(404).json({ message: 'Route not found' });
+// Serve static files from the frontend app
+app.use(express.static(path.join(__dirname, 'frontend/dist')));
+
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend/dist/index.html'));
 });
 
 // Error Handler Middleware (must be last)
